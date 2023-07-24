@@ -57,16 +57,45 @@ btn_Update_CosucompanyServer <- function(input,output,session,dms_token) {
     #上传至数据库至重分类暂存表
     tsda::db_writeTable2(token = '057A7F0E-F187-4975-8873-AF71666429AB',table_name = 'rds_hrv_src_md_cosucompany_input',r_object = data,append = TRUE)
     #删除重分类已有数据
-    mdlJHmdPkg::deleteCache_cosucompany()
+    mdlJhhrvMdPkg::deleteCache_cosucompany()
     #将暂存表数据插入重分类
-    mdlJHmdPkg::insertCache_cosucompany()
+    mdlJhhrvMdPkg::insertCache_cosucompany()
     #删除重分类暂存表数据
-    mdlJHmdPkg::deleteAllcache_cosucompany()
+    mdlJhhrvMdPkg::deleteAllcache_cosucompany()
     tsui::pop_notice("往来单位更新成功")
 
   })
 }
 
+#' 处理逻辑
+#'
+#' @param input 输入
+#' @param output 输出
+#' @param session 会话
+#' @param dms_token 口令
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' btn_preview_CosucompanyServer()
+#'
+btn_download_CosucompanyServer <- function(input,output,session,dms_token) {
+  
+  shiny::observeEvent(input$btn_view_Cosucompany,{
+    data_Cosucompany = mdlJhhrvMdPkg::ViewCosucompany()
+    
+    tsui::run_dataTable2(id = 'dl_dataview_Cosucompany',data =data_Cosucompany )
+    
+    
+    #下载数据
+    tsui::run_download_xlsx(id = 'dl_dataview_Cosucompany',data =data_Cosucompany ,filename = '往来单位数据.xlsx')
+    
+    
+  })
+  
+  
+}
 
 
 
@@ -87,6 +116,7 @@ CosucompanyServer <- function(input,output,session,dms_token) {
   btn_preview_CosucompanyServer(input,output,session,dms_token)
   #演示功能2
   btn_Update_CosucompanyServer(input,output,session,dms_token)
+  btn_download_CosucompanyServer(input,output,session,dms_token)
 
 
 

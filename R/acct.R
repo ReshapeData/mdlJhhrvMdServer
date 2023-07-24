@@ -57,14 +57,49 @@ btn_Update_AcctServer <- function(input,output,session,dms_token) {
     #上传至数据库至重分类暂存表
     tsda::db_writeTable2(token = '057A7F0E-F187-4975-8873-AF71666429AB',table_name = 'rds_hrv_src_md_acct_input',r_object = data,append = TRUE)
     #删除重分类已有数据
-    mdlJHmdPkg::deleteCache_acct()
+    mdlJhhrvMdPkg::deleteCache_acct()
     #将暂存表数据插入重分类
-    mdlJHmdPkg::insertCache_acct()
+    mdlJhhrvMdPkg::insertCache_acct()
     #删除重分类暂存表数据
-    mdlJHmdPkg::deleteAllcache_acct()
-    tsui::pop_notice("核算维度_重分类更新成功")
+    mdlJhhrvMdPkg::deleteAllcache_acct()
+    tsui::pop_notice("科目更新成功")
+    
+    
+    
+    
+    
 
   })
+}
+
+#' 处理逻辑
+#'
+#' @param input 输入
+#' @param output 输出
+#' @param session 会话
+#' @param dms_token 口令
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' btn_preview_AcctServer()
+#'
+btn_download_AcctServer <- function(input,output,session,dms_token) {
+  
+  shiny::observeEvent(input$btn_view_Acct,{
+    data_acct = mdlJhhrvMdPkg::ViewAcct()
+    
+    tsui::run_dataTable2(id = 'dl_dataview_Acct',data =data_acct )
+    
+    
+    #下载数据
+    tsui::run_download_xlsx(id = 'dl_dataview_Acct',data =data_acct ,filename = '科目数据.xlsx')
+    
+    
+  })
+  
+  
 }
 
 
@@ -87,6 +122,8 @@ AcctServer <- function(input,output,session,dms_token) {
   btn_preview_AcctServer(input,output,session,dms_token)
   #演示功能2
   btn_Update_AcctServer(input,output,session,dms_token)
+  btn_download_AcctServer(input,output,session,dms_token)
+  
 
 
 
