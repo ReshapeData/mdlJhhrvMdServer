@@ -17,12 +17,20 @@ btn_preview_AcctreclassServer <- function(input,output,session,dms_token) {
 
 
   shiny::observeEvent(input$btn_preview_Acctreclass,{
-    filename=var_file_expInfo_Acctreclass()
-
-    data <- readxl::read_excel(filename,sheet = "核算维度-重分类", col_types = c("numeric","text","text"))
-    data=as.data.frame(data)
-    data=tsdo::na_standard(data)
-    tsui::run_dataTable2(id = 'mdlJHmd_Acctreclass_resultView',data = data)
+    if(!is.null(var_file_expInfo_Acctreclass())){
+      filename=var_file_expInfo_Acctreclass()
+      
+      data <- readxl::read_excel(filename,sheet = "核算维度-重分类", col_types = c("numeric","text","text"))
+      data=as.data.frame(data)
+      data=tsdo::na_standard(data)
+      tsui::run_dataTable2(id = 'mdlJHmd_Acctreclass_resultView',data = data)
+      
+    }
+    else{
+      tsui::pop_notice("请先上传文件")
+    }
+    
+    
 
 
   })
@@ -48,22 +56,31 @@ btn_Update_AcctreclassServer <- function(input,output,session,dms_token) {
 
 
   shiny::observeEvent(input$'btn_Update_Acctreclass',{
+    
+    if(!is.null(var_file_expInfo_Acctreclass())){
+      
+      filename=var_file_expInfo_Acctreclass()
+      data<-readxl::read_excel(filename,sheet = "核算维度-重分类", col_types = c("numeric","text","text"))
+      data=as.data.frame(data)
+      data=tsdo::na_standard(data)
+      #上传至数据库至重分类暂存表
+      tsda::db_writeTable2(token = '9ADDE293-1DC6-4EBC-B8A7-1E5CC26C1F6C',table_name = 'rds_hrv_src_md_acctreclass_input',r_object = data,append = TRUE)
+      #删除重分类已有数据
+      mdlJhhrvMdPkg::deleteCache_acctreclass()
+      #将暂存表数据插入重分类
+      mdlJhhrvMdPkg::insertCache_acctreclass()
+      #删除重分类暂存表数据
+      mdlJhhrvMdPkg::deleteAllcache_acctreclass()
+      tsui::pop_notice("核算维度_重分类更新成功")
+      
+      
+    }
+    else{
+      tsui::pop_notice("请先上传文件")
+    }
+    
 
-
-    filename=var_file_expInfo_Acctreclass()
-    data<-readxl::read_excel(filename,sheet = "核算维度-重分类", col_types = c("numeric","text","text"))
-    data=as.data.frame(data)
-    data=tsdo::na_standard(data)
-    #上传至数据库至重分类暂存表
-    tsda::db_writeTable2(token = '057A7F0E-F187-4975-8873-AF71666429AB',table_name = 'rds_hrv_src_md_acctreclass_input',r_object = data,append = TRUE)
-    #删除重分类已有数据
-    mdlJhhrvMdPkg::deleteCache_acctreclass()
-    #将暂存表数据插入重分类
-    mdlJhhrvMdPkg::insertCache_acctreclass()
-    #删除重分类暂存表数据
-    mdlJhhrvMdPkg::deleteAllcache_acctreclass()
-    tsui::pop_notice("核算维度_重分类更新成功")
-
+    
   })
 }
 
@@ -85,11 +102,11 @@ btn_download_AcctreclassServer <- function(input,output,session,dms_token) {
   shiny::observeEvent(input$btn_view_Acctreclass,{
     data_Acctreclass = mdlJhhrvMdPkg::ViewAcctreclass()
     
-    tsui::run_dataTable2(id = 'dl_dataview_Acctreclass',data =data_Acctreclass )
+    tsui::run_dataTable2(id = 'mdlJHmd_Acctreclass_resultView',data =data_Acctreclass )
     
     
     #下载数据
-    tsui::run_download_xlsx(id = 'dl_dataview_Acctreclass',data =data_Acctreclass ,filename = '重分类数据.xlsx')
+    tsui::run_download_xlsx(id = 'mdlJHmd_Acctreclass_resultView',data =data_Acctreclass ,filename = '重分类数据.xlsx')
     
     
   })
